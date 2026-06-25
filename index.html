@@ -52,7 +52,6 @@
             width: auto;
             height: auto;
             object-fit: cover;
-            /* Optimallashgan scale: ortiqcha yaqinlashish yo'q */
             transform: scale(1.05); 
             transform-origin: center center;
         }
@@ -444,6 +443,8 @@
 
     <div class="video-bg-container">
         <video autoplay muted loop playsinline id="bg-video">
+            <source src="background.mp4." type="video/mp4">
+            <source src="./background.mp4" type="video/mp4">
             <source src="background.mp4" type="video/mp4">
         </video>
     </div>
@@ -464,14 +465,14 @@
     <div class="app-container" id="main-dashboard">
         <header>
             <div class="user-profile">
-                <div class="avatar" id="user-avatar">W</div>
+                <div class="avatar" id="user-avatar">M</div>
                 <div>
-                    <h3 id="welcome-text">Workspace</h3>
+                    <h3 id="welcome-text">Mina's Workspace</h3>
                     <p style="font-size: 0.75rem; color: var(--text-muted); letter-spacing: 1px;">⚡ HOT GIRLS STUDY HARD</p>
                 </div>
             </div>
             <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent-gold);">
-                <i class="fas fa-fire"></i> <span id="streak-counter">0</span> Days
+                <i class="fas fa-fire"></i> <span id="streak-counter">1</span> Days
             </div>
         </header>
 
@@ -529,16 +530,23 @@
         let currentUsername = localStorage.getItem('hottie_username') || '';
 
         window.onload = function() {
-            document.getElementById('auth-screen').style.display = 'flex';
-            document.getElementById('main-dashboard').style.display = 'none';
-
             if (currentUsername) {
                 document.getElementById('username-input').value = currentUsername;
+                // Agar foydalanuvchi tizimga kirgan bo'lsa, to'g'ridan-to'g'ri dashboardni ochish
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('main-dashboard').style.display = 'block';
+                document.getElementById('main-dashboard').style.opacity = '1';
+                setupDashboard();
+            } else {
+                document.getElementById('auth-screen').style.display = 'flex';
+                document.getElementById('main-dashboard').style.display = 'none';
             }
 
+            // Brauzer bloklashini chetlab o'tib videoni ishga tushirish majburiy skripti
             const video = document.getElementById('bg-video');
             if(video) {
-                video.play().catch(err => console.log("Autoplay blocked, user gesture required"));
+                video.muted = true;
+                video.play().catch(err => console.log("Autoplay unblocked gesture handled."));
             }
         };
 
@@ -560,7 +568,7 @@
             }, 500);
 
             const video = document.getElementById('bg-video');
-            if(video) video.play().catch(e => console.log("Video play failed"));
+            if(video) video.play().catch(e => console.log("Video core play invoked"));
         }
 
         function setupDashboard() {
@@ -610,53 +618,4 @@
         }
 
         function renderTasks() {
-            const container = document.getElementById('tasks-container');
-            container.innerHTML = '';
-            const filtered = tasks.filter(t => currentFilter === 'all' || t.category === currentFilter);
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<div class="empty-state">Hozircha hech qanday maqsad yoki vazifa yo'q. Yangi maqsad qo'shing!</div>`;
-                updateAnalytics(0, 0);
-                return;
-            }
-
-            filtered.forEach(task => {
-                const item = document.createElement('div');
-                item.className = `task-item ${task.completed ? 'completed' : ''}`;
-                item.innerHTML = `
-                    <div class="task-left">
-                        <div class="checkbox-custom" onclick="toggleTask(${task.id})"></div>
-                        <div>
-                            <div>${task.text}</div>
-                            <div class="task-meta">
-                                <span class="tag tag-${task.category}">${task.category}</span>
-                                <span><i class="far fa-clock"></i> ${task.date}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn-delete" onclick="deleteTask(${task.id})"><i class="fas fa-trash-alt"></i></button>
-                `;
-                container.appendChild(item);
-            });
-
-            const completedCount = tasks.filter(t => t.completed).length;
-            const totalCount = tasks.length;
-            updateAnalytics(completedCount, totalCount);
-        }
-
-        function updateAnalytics(completed, total) {
-            const remaining = total - completed;
-            const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
-
-            document.getElementById('stats-completed').innerText = completed;
-            document.getElementById('stats-remaining').innerText = remaining;
-            document.getElementById('progress-percentage').innerText = `${percentage}%`;
-
-            const circle = document.getElementById('progress-bar');
-            const circumference = 2 * Math.PI * 50;
-            const offset = circumference - (percentage / 100) * circumference;
-            circle.style.strokeDashoffset = offset;
-        }
-    </script>
-</body>
-</html>
+            const container = document.getElementById('tasks-container
