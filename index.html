@@ -32,6 +32,7 @@
             position: relative;
         }
 
+        /* FULLSCREEN VIDEO BACKGROUND IMPLEMENTATION */
         .video-bg-container {
             position: fixed;
             top: 0;
@@ -51,10 +52,12 @@
             width: auto;
             height: auto;
             object-fit: cover;
-            transform: scale(1.4); 
+            /* Optimallashgan scale: ortiqcha yaqinlashish yo'q */
+            transform: scale(1.05); 
             transform-origin: center center;
         }
 
+        /* DARK OVERLAY FOR TEXT READABILITY */
         .video-overlay {
             position: fixed;
             top: 0;
@@ -168,7 +171,7 @@
             box-shadow: 0 6px 25px rgba(124, 58, 237, 0.5);
         }
 
-        /* ASOSIY DASHBOARD */
+        /* ASOSIY PANEL (DASHBOARD) */
         .app-container {
             max-width: 800px;
             margin: 0 auto;
@@ -440,8 +443,8 @@
 <body>
 
     <div class="video-bg-container">
-        <video autoplay loop muted playsinline id="bg-video">
-            <source src="chinese_students_motiv.mp4" type="video/mp4">
+        <video autoplay muted loop playsinline id="bg-video">
+            <source src="background.mp4" type="video/mp4">
         </video>
     </div>
     <div class="video-overlay"></div>
@@ -535,7 +538,7 @@
 
             const video = document.getElementById('bg-video');
             if(video) {
-                video.play().catch(err => console.log("Autoplay blocked"));
+                video.play().catch(err => console.log("Autoplay blocked, user gesture required"));
             }
         };
 
@@ -557,7 +560,7 @@
             }, 500);
 
             const video = document.getElementById('bg-video');
-            if(video) video.play();
+            if(video) video.play().catch(e => console.log("Video play failed"));
         }
 
         function setupDashboard() {
