@@ -1,1279 +1,704 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Doctor Slump - Premium Productivity Workspace</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0A0A0F;
-    --surface: #12121C;
-    --surface-2: #181826;
-    --purple: #A78BFA;
-    --purple-dark: #6D28D9;
-    --pink: #EC4899;
-    --green: #39FF88;
-    --text: #E8E6F0;
-    --text-dim: #6B6878;
-    --border: #232233;
-    --anim-speed: 0.2s;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Slump - Premium Routine</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d0b14;
+            --panel-bg: rgba(23, 20, 33, 0.75);
+            --accent-purple: #a78bfa;
+            --accent-red: #ef4444;
+            --accent-gold: #fbbf24;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: rgba(167, 139, 250, 0.2);
+        }
 
-  .no-animations * {
-    transition: none !important;
-    animation: none !important;
-  }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
 
-  body {
-    margin: 0;
-    background-color: var(--bg);
-    background-image: radial-gradient(circle at 20% 0%, #14141f 0%, #0A0A0F 55%);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    padding: 24px 16px 60px;
-    overflow-x: hidden;
-  }
+        /* VIDEO BACKGROUND SYSTEM */
+        .video-bg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
 
-  /* ---------- STABLE LIVE BACKDROP CONTROLLER ---------- */
-  .video-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -2;
-    overflow: hidden;
-    background: #0A0A0F;
-  }
-  .video-bg video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: brightness(0.25) saturate(0.85);
-  }
-  .video-overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: radial-gradient(circle at 50% 50%, rgba(10,10,15,0.6) 0%, #0A0A0F 95%);
-    z-index: -1;
-  }
+        .video-bg-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-  /* ---------- SYSTEM AUTHENTICATION CARD ---------- */
-  .user-setup {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: radial-gradient(circle at 50% 50%, #141424 0%, #06060A 100%);
-    z-index: 2000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
-  .user-setup.active { display: flex; }
-  .setup-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 44px 36px;
-    max-width: 440px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-  }
-  .setup-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 38px; font-weight: 800; margin: 0 0 8px;
-    background: linear-gradient(180deg, #FFFFFF 0%, var(--purple) 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .setup-subtitle { color: var(--text-dim); font-size: 14px; margin: 0 0 32px; }
+        /* Dark Luxury Overlay to maintain text contrast */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(13, 11, 20, 0.85) 0%, rgba(20, 10, 25, 0.9) 100%);
+            z-index: -1;
+        }
 
-  /* ---------- GENERAL ACCESSIBLE INTERFACES ---------- */
-  .setup-input, .add-input, .select-input {
-    width: 100%; background: var(--surface-2);
-    border: 2px solid var(--border); border-radius: 14px;
-    color: var(--text); font-family: inherit; font-size: 15px;
-    padding: 14px 16px; transition: all var(--anim-speed);
-  }
-  .setup-input:focus, .add-input:focus, .select-input:focus {
-    outline: none; border-color: var(--purple);
-    box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.15);
-  }
-  .setup-btn, .add-btn, .btn-primary {
-    background: var(--purple); color: #050508; border: none;
-    border-radius: 14px; padding: 14px 24px; font-weight: 700; font-size: 15px;
-    cursor: pointer; font-family: 'Space Grotesk', sans-serif;
-    transition: all var(--anim-speed); min-height: 48px;
-  }
-  .setup-btn:hover, .add-btn:hover, .btn-primary:hover {
-    filter: brightness(1.1); transform: translateY(-1px);
-  }
-  .setup-btn:active, .add-btn:active, .btn-primary:active {
-    transform: translateY(0);
-  }
+        /* APP AUTH SCREEN */
+        #auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(15px);
+            background: rgba(13, 11, 20, 0.9);
+            transition: all 0.5s ease;
+        }
 
-  /* ---------- CONTAINER PLATFORM LAYOUT ---------- */
-  .app { display: none; }
-  .app.active { display: block; }
-  .container { max-width: 680px; margin: 0 auto; position: relative; }
+        .auth-card {
+            background: var(--panel-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
 
-  /* ---------- APP NAVIGATION & CONTROL STRIPS ---------- */
-  .header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border);
-  }
-  .user-info { display: flex; align-items: center; gap: 14px; }
-  .user-avatar {
-    width: 52px; height: 52px; border-radius: 16px;
-    background: linear-gradient(135deg, var(--purple-dark), var(--pink));
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; color: white; font-size: 18px;
-    box-shadow: 0 8px 24px rgba(167, 139, 250, 0.25);
-    font-family: 'Space Grotesk', sans-serif;
-  }
-  .user-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
-  .user-name { font-size: 18px; color: var(--text); font-weight: 700; }
-  .header-buttons { display: flex; gap: 10px; }
+        .auth-icon {
+            font-size: 3.5rem;
+            color: var(--accent-purple);
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
 
-  .btn-secondary {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); padding: 10px 16px; border-radius: 12px;
-    cursor: pointer; font-size: 13px; font-weight: 600;
-    transition: all var(--anim-speed); min-height: 40px;
-    display: inline-flex; align-items: center; justify-content: center;
-  }
-  .btn-secondary:hover, .btn-secondary:focus {
-    border-color: var(--purple); color: var(--purple); outline: none;
-  }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
 
-  /* ---------- TAB CONTROLLERS ---------- */
-  .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
-  .tab-btn {
-    background: none; border: none; color: var(--text-dim);
-    padding: 14px 20px; font-size: 15px; font-weight: 600; cursor: pointer;
-    border-bottom: 3px solid transparent; transition: all var(--anim-speed);
-    font-family: 'Space Grotesk', sans-serif;
-  }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.active { color: var(--purple); border-bottom-color: var(--purple); }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; animation: fadeIn 0.25s ease-out; }
+        .auth-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
 
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .auth-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
 
-  /* ---------- GAMIFIED MOTIVATIONAL & STREAK WIDGETS ---------- */
-  .quote-card {
-    background: linear-gradient(135deg, rgba(24, 24, 38, 0.8), rgba(18, 18, 28, 0.8));
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--border); border-radius: 18px;
-    padding: 20px 24px; margin-bottom: 24px; position: relative; overflow: hidden;
-  }
-  .quote-card::before {
-    content: '"'; position: absolute; top: -10px; left: 12px;
-    font-size: 90px; color: rgba(167, 139, 250, 0.08); font-family: serif; font-weight: bold;
-  }
-  .quote-text { font-size: 14px; line-height: 1.6; color: var(--text); font-style: italic; margin-bottom: 6px; position: relative; }
-  .quote-author { font-size: 12px; color: var(--purple); font-weight: 600; text-align: right; }
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
 
-  .streak-ribbon {
-    display: flex; gap: 12px; margin-bottom: 24px;
-  }
-  .streak-badge {
-    flex: 1; background: rgba(18, 18, 28, 0.6); border: 1px solid var(--border);
-    border-radius: 16px; padding: 14px; display: flex; align-items: center; gap: 14px;
-  }
-  .streak-icon { font-size: 26px; }
-  .streak-meta div:first-child { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
-  .streak-meta div:last-child { font-size: 20px; font-weight: 800; color: #FFFFFF; font-family: 'Space Grotesk', sans-serif; }
+        .input-group input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
 
-  /* ---------- METRIC CIRCLES & PERFORMANCE COUNTERS ---------- */
-  .progress-card {
-    background: rgba(18, 18, 28, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border); border-radius: 24px; padding: 28px; margin-bottom: 24px;
-  }
-  .progress-layout { display: flex; align-items: center; gap: 32px; }
-  .progress-circle { width: 150px; height: 150px; position: relative; flex-shrink: 0; }
-  .progress-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .progress-bg-circle { fill: none; stroke: var(--border); stroke-width: 9; }
-  .progress-fill-circle {
-    fill: none; stroke: url(#progressGradient); stroke-width: 9;
-    stroke-linecap: round; transition: stroke-dashoffset 0.5s ease;
-    filter: drop-shadow(0 0 6px rgba(167, 139, 250, 0.4));
-  }
-  .progress-center-text {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;
-  }
-  .progress-percent { font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 800; color: var(--purple); }
-  
-  .progress-info-panel { flex: 1; }
-  .progress-heading { font-family: 'Space Grotesk', sans-serif; font-size: 18px; margin: 0 0 12px; font-weight: 700; }
-  .progress-counters { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .counter-pill { background: var(--surface-2); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border); }
-  .counter-num { font-size: 18px; font-weight: 700; color: #FFFFFF; font-family: 'Space Grotesk', sans-serif; }
-  .counter-lbl { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+        .input-group input:focus {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
+        }
 
-  /* ---------- TASK INJECTOR FORM & FILTERS ---------- */
-  .task-creator-block {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
-    padding: 20px; margin-bottom: 24px;
-  }
-  .add-task-form { display: flex; flex-direction: column; gap: 12px; }
-  .form-row-2 { display: flex; gap: 12px; }
-  .category-select { flex: 1; height: 48px; background-color: var(--surface-2); cursor: pointer; }
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(90deg, #a78bfa, #8b5cf6);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
+        }
 
-  .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
-  .filter-chip {
-    background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim);
-    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer;
-    white-space: nowrap; transition: all var(--anim-speed);
-  }
-  .filter-chip:hover { color: var(--text); border-color: var(--text-dim); }
-  .filter-chip.active { background: rgba(167, 139, 250, 0.15); border-color: var(--purple); color: var(--purple); }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(167, 139, 250, 0.6);
+        }
 
-  /* ---------- DATA CONTAINER & INTERACTIVE ROW ITEMS ---------- */
-  .tasks-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
-  .tasks-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin: 0 0 16px; }
-  .task-item {
-    display: flex; align-items: center; gap: 14px; padding: 14px 16px;
-    background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px;
-    margin-bottom: 10px; transition: all var(--anim-speed); position: relative;
-  }
-  .task-item:hover { border-color: #3b3a54; }
-  .task-item.completed { background: rgba(167, 139, 250, 0.04); border-color: rgba(167, 139, 250, 0.2); }
-  
-  .task-checkbox {
-    width: 24px; height: 24px; border-radius: 8px; border: 2px solid var(--border);
-    background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; color: transparent; font-weight: 800; font-size: 13px; transition: all var(--anim-speed);
-  }
-  .task-item:hover .task-checkbox { border-color: var(--purple); }
-  .task-checkbox.checked { background: var(--purple); border-color: var(--purple); color: var(--bg); }
+        /* MAIN DASHBOARD */
+        .app-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            display: none;
+        }
 
-  .task-content-wrapper { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-  .task-label { font-size: 14px; color: var(--text); word-break: break-word; outline: none; border-bottom: 1px solid transparent; transition: all var(--anim-speed); }
-  .task-label:focus { border-bottom-color: var(--purple); background: rgba(255,255,255,0.03); padding: 2px 4px; border-radius: 4px; }
-  .task-item.completed .task-label { color: var(--text-dim); text-decoration: line-through; }
-  
-  .task-cat-badge { display: inline-block; font-size: 11px; font-weight: 600; color: var(--purple); padding: 2px 0; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--panel-bg);
+            padding: 1.2rem 2rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(5px);
+        }
 
-  .task-actions { display: flex; gap: 4px; opacity: 0; transition: opacity var(--anim-speed); }
-  .task-item:hover .task-actions, .task-item:focus-within .task-actions { opacity: 1; }
-  .action-icon-btn {
-    background: none; border: none; color: var(--text-dim); cursor: pointer;
-    font-size: 14px; padding: 6px; border-radius: 8px; transition: color var(--anim-speed);
-  }
-  .action-icon-btn:hover { color: var(--purple); background: rgba(255,255,255,0.05); }
-  .action-icon-btn.delete-btn:hover { color: var(--pink); }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-  /* ---------- WEEKLY INTUITIVE ANALYTICS ENGINE ---------- */
-  .analytics-overview-box {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;
-  }
-  @media (min-width: 550px) {
-    .analytics-overview-box { grid-template-columns: repeat(4, 1fr); }
-  }
-  .chart-section { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
-  .chart-title { font-size: 13px; font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin: 0 0 20px; }
-  
-  /* PURE CSS FLEX GRID GRAPH SYSTEM */
-  .bar-chart-wrapper { display: flex; justify-content: space-between; align-items: flex-end; height: 160px; padding: 0 10px; gap: 8px; }
-  .chart-column { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; }
-  .chart-bar-container { width: 100%; background: var(--surface); border-radius: 6px; height: 120px; display: flex; align-items: flex-end; overflow: hidden; position: relative; border: 1px solid var(--border); }
-  .chart-bar-fill {
-    width: 100%; height: 0%; background: linear-gradient(180deg, var(--purple) 0%, var(--pink) 100%);
-    border-radius: 4px; transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .chart-day-label { font-size: 11px; color: var(--text-dim); margin-top: 8px; font-weight: 600; }
-  .chart-bar-container:hover .chart-bar-fill { filter: brightness(1.2); }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-red));
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
 
-  .week-day { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 12px; }
-  .week-day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .week-day-title { font-weight: 700; color: #FFFFFF; font-size: 15px; }
-  .week-day-date { font-size: 13px; color: var(--purple); font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
-  .week-day-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        /* ANALYTICS CARD */
+        .analytics-card {
+            background: var(--panel-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(5px);
+        }
 
-  /* ---------- CONFIGURATION LAYOUT PANEL ---------- */
-  .settings-row { padding: 16px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-  .settings-row:last-child { border-bottom: none; }
-  .settings-meta h3 { margin: 0 0 4px; font-size: 15px; font-weight: 600; }
-  .settings-meta p { margin: 0; font-size: 12px; color: var(--text-dim); line-height: 1.4; }
-  .toggle-switch {
-    position: relative; inline-size: 48px; block-size: 26px; flex-shrink: 0;
-  }
-  .toggle-switch input { opacity: 0; width: 0; height: 0; }
-  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--surface-2); border: 2px solid var(--border); transition: .2s; border-radius: 34px; }
-  .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: var(--text-dim); transition: .2s; border-radius: 50%; }
-  input:checked + .slider { background-color: var(--purple-dark); border-color: var(--purple); }
-  input:checked + .slider:before { transform: translateX(22px); background-color: white; }
+        .progress-circle-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-  .btn-danger { background: rgba(236, 72, 153, 0.1); border: 1px solid var(--pink); color: var(--pink); }
-  .btn-danger:hover { background: var(--pink); color: #000000; }
+        .progress-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            position: absolute;
+        }
 
-  /* ---------- SYSTEM ALERT NOTIFICATION SHELF ---------- */
-  .completion-message {
-    display: none; background: rgba(57, 255, 136, 0.1); border: 1px solid var(--green);
-    border-radius: 14px; padding: 14px; margin-bottom: 20px; text-align: center; font-size: 14px; color: var(--green);
-    font-weight: 600; animation: slideIn 0.3s ease;
-  }
-  .completion-message.show { display: block; }
-  @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            flex-grow: 1;
+        }
 
-  .empty-state { text-align: center; padding: 36px 16px; color: var(--text-dim); }
-  .empty-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-  .empty-desc { font-size: 12px; max-width: 280px; margin: 0 auto 16px; line-height: 1.5; }
-  .template-box { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+        .stat-box {
+            background: rgba(255,255,255,0.03);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
 
-  /* ---------- REWORKED MOBILE INTERACTIVE MEDIA CONTROLS ---------- */
-  @media (max-width: 520px) {
-    .header { flex-direction: column; align-items: flex-start; gap: 16px; }
-    .header-buttons { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-    .btn-secondary { padding: 8px 10px; font-size: 12px; }
-    .progress-layout { flex-direction: column; gap: 20px; align-items: center; }
-    .progress-circle { width: 130px; height: 130px; }
-    .progress-percent { font-size: 36px; }
-    .task-actions { opacity: 1; }
-  }
-</style>
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* CREATOR BLOCK */
+        .creator-section {
+            background: var(--panel-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .task-input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .task-input-row input {
+            flex-grow: 1;
+            padding: 1rem;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: white;
+            outline: none;
+        }
+
+        .task-input-row input:focus {
+            border-color: var(--accent-purple);
+        }
+
+        .select-category {
+            padding: 1rem;
+            background: #171421;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .btn-add {
+            padding: 0 1.5rem;
+            background: var(--accent-purple);
+            border: none;
+            border-radius: 12px;
+            color: #0d0b14;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add:hover {
+            opacity: 0.9;
+        }
+
+        /* FILTERS */
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.2rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid transparent;
+            border-radius: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn.active {
+            background: rgba(167, 139, 250, 0.15);
+            border-color: var(--accent-purple);
+            color: white;
+        }
+
+        /* TASKS MATRIX */
+        .tasks-grid {
+            background: var(--panel-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            min-height: 200px;
+            backdrop-filter: blur(5px);
+        }
+
+        .grid-title {
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            border-left: 4px solid var(--accent-purple);
+            transition: all 0.3s ease;
+        }
+
+        .task-item.completed {
+            opacity: 0.5;
+            border-left-color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .task-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-purple);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .task-item.completed .checkbox-custom {
+            background: var(--accent-purple);
+        }
+
+        .checkbox-custom::after {
+            content: '✓';
+            color: #0d0b14;
+            font-size: 12px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .task-item.completed .checkbox-custom::after {
+            display: block;
+        }
+
+        .task-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .tag-study { background: rgba(167, 139, 250, 0.2); color: #c084fc; }
+        .tag-health { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+        .tag-deen { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .tag-personal { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: color 0.2s ease;
+        }
+
+        .btn-delete:hover {
+            color: var(--accent-red);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 3rem 1rem;
+            font-size: 0.95rem;
+        }
+    </style>
 </head>
 <body>
 
-<div class="video-bg">
-  <video autoplay muted loop playsinline id="bg-video">
-    <source src="https://media.giphy.com/media/l0HlNaQ9ycJEfR2YU/giphy.mp4" type="video/mp4">
-  </video>
-  <div class="video-overlay"></div>
-</div>
-
-<div class="user-setup" id="user-setup">
-  <div class="setup-card">
-    <h1 class="setup-title">🩺 Doctor Slump</h1>
-    <p class="setup-subtitle">Optimized Mental Focus & Routine Engine</p>
-    <input type="text" class="setup-input" id="setup-name-input" placeholder="Enter your handle..." maxlength="25">
-    <button class="setup-btn" id="setup-start-btn" style="margin-top: 16px; width: 100%;">Initialize Workspace</button>
-  </div>
-</div>
-
-<div class="app" id="app">
-  <div class="container">
-    
-    <div class="header">
-      <div class="user-info">
-        <div class="user-avatar" id="user-avatar">DS</div>
-        <div>
-          <div class="user-label">SYSTEM USER</div>
-          <div class="user-name" id="user-name">Loading...</div>
-        </div>
-      </div>
-      <div class="header-buttons">
-        <button class="btn-secondary" id="nav-dash-btn">Dashboard</button>
-        <button class="btn-secondary" id="nav-config-btn">Settings</button>
-        <button class="btn-secondary" id="logout-btn">Exit</button>
-      </div>
+    <!-- K-DRAMA VIDEO FON TIZIMI -->
+    <div class="video-bg-container">
+        <!-- Yuqori sifatli sokin estetika va o'qish motivatsiyasi videosi (Pexels bepul hovuzidan olingan) -->
+        <video autoplay loop muted playsinline poster="https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg">
+            <source src="https://player.vimeo.com/external/477123992.sd.mp4?s=e84e568ebcd57297f698e404b90f4db2393ba02f&profile_id=165&oauth2_token_id=57447761" type="video/mp4">
+            Sizning brauzeringiz videoni qo'llab-quvvatlamaydi.
+        </video>
     </div>
+    <div class="video-overlay"></div>
 
-    <div id="motive-banner-region">
-      <div class="quote-card">
-        <div class="quote-text" id="quote-display">"Your speed doesn't matter as long as you don't stop."</div>
-        <div class="quote-author" id="quote-author">— System Engine</div>
-      </div>
-    </div>
-
-    <div class="streak-ribbon">
-      <div class="streak-badge">
-        <div class="streak-icon">🔥</div>
-        <div class="streak-meta">
-          <div>Current Streak</div>
-          <div id="streak-curr">0 Days</div>
-        </div>
-      </div>
-      <div class="streak-badge">
-        <div class="streak-icon">👑</div>
-        <div class="streak-meta">
-          <div>All-Time High</div>
-          <div id="streak-best">0 Days</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="daily">Daily Tasks</button>
-      <button class="tab-btn" data-tab="weekly">Weekly Analytics</button>
-    </div>
-
-    <div class="tab-content active" data-tab="daily">
-      <div class="completion-message" id="completion-message">
-        🎯 Sector Clear! 100% of planned targets hit for today!
-      </div>
-
-      <div class="progress-card">
-        <div class="progress-layout">
-          <div class="progress-circle">
-            <svg class="progress-svg" viewBox="0 0 100 100">
-              <defs>
-                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style="stop-color:var(--purple)" />
-                  <stop offset="100%" style="stop-color:var(--pink)" />
-                </linearGradient>
-              </defs>
-              <circle class="progress-bg-circle" cx="50" cy="50" r="41"></circle>
-              <circle class="progress-fill-circle" id="progress-circle" cx="50" cy="50" r="41"></circle>
-            </svg>
-            <div class="progress-center-text">
-              <div class="progress-percent" id="progress-percent">0%</div>
+    <!-- KIRISH EKRANI -->
+    <div id="auth-screen">
+        <div class="auth-card">
+            <div class="auth-icon"><i class="fas fa-stethoscope"></i></div>
+            <div class="auth-title">Doctor Slump</div>
+            <div class="auth-subtitle">Optimized Mental Focus & Routine Engine</div>
+            <div class="input-group">
+                <input type="text" id="username-input" placeholder="Enter your handle..." autocomplete="off">
             </div>
-          </div>
-          <div class="progress-info-panel">
-            <h3 class="progress-heading">Today's Performance</h3>
-            <div class="progress-counters">
-              <div class="counter-pill">
-                <div class="counter-num" id="cnt-done">0</div>
-                <div class="counter-lbl">Completed</div>
-              </div>
-              <div class="counter-pill">
-                <div class="counter-num" id="cnt-left">0</div>
-                <div class="counter-lbl">Remaining</div>
-              </div>
+            <button class="btn-primary" onclick="initializeWorkspace()">Initialize Workspace</button>
+        </div>
+    </div>
+
+    <!-- ASOSIY INTERFEYS -->
+    <div class="app-container" id="main-dashboard">
+        <header>
+            <div class="user-profile">
+                <div class="avatar" id="user-avatar">U</div>
+                <div>
+                    <h3 id="welcome-text">Workspace</h3>
+                    <p style="font-size: 0.75rem; color: var(--text-muted);">⚡ Hot Girls Study Hard</p>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="task-creator-block">
-        <div class="add-task-form">
-          <input type="text" class="add-input" id="new-task-input" placeholder="Type a task objective..." maxlength="60">
-          <div class="form-row-2">
-            <select class="select-input category-select" id="new-task-cat">
-              <option value="Study 📚">Study 📚</option>
-              <option value="Health 💪">Health 💪</option>
-              <option value="Deen 🤲">Deen 🤲</option>
-              <option value="Personal 🌱">Personal 🌱</option>
-            </select>
-            <button class="add-btn" id="add-task-btn">Add Task</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="filter-bar" id="category-filter-bar">
-        <span class="filter-chip active" data-filter="all">All Items</span>
-        <span class="filter-chip" data-filter="Study 📚">Study 📚</span>
-        <span class="filter-chip" data-filter="Health 💪">Health 💪</span>
-        <span class="filter-chip" data-filter="Deen 🤲">Deen 🤲</span>
-        <span class="filter-chip" data-filter="Personal 🌱">Personal 🌱</span>
-      </div>
-
-      <div class="tasks-card">
-        <h2 class="tasks-title">Daily Execution Grid</h2>
-        <div id="tasks-container"></div>
-      </div>
-    </div>
-
-    <div class="tab-content" data-tab="weekly">
-      <div class="analytics-overview-box">
-        <div class="stat-box">
-          <div class="stat-value" id="stat-w-done">0</div>
-          <div class="stat-label">Total Done</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value" style="color:var(--purple);" id="stat-w-pct">0%</div>
-          <div class="stat-label">Avg Rate</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value" style="color:var(--green);" id="stat-w-best">N/A</div>
-          <div class="stat-label">Peak Day</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value" style="color:var(--pink);" id="stat-w-miss">0</div>
-          <div class="stat-label">Total Missed</div>
-        </div>
-      </div>
-
-      <div class="chart-section">
-        <h3 class="chart-title">7-Day Completion Trend</h3>
-        <div class="bar-chart-wrapper" id="trend-bar-chart"></div>
-      </div>
-
-      <div class="tasks-card">
-        <h2 class="tasks-title">Historical Log Review</h2>
-        <div id="weekly-container"></div>
-      </div>
-    </div>
-
-    <div class="tab-content" data-tab="settings">
-      <div class="tasks-card">
-        <h2 class="tasks-title">System Settings</h2>
-        
-        <div class="settings-row">
-          <div class="settings-meta">
-            <h3>Change Identity Handle</h3>
-            <p>Update the name tied to your local workspace metrics profile.</p>
-          </div>
-          <input type="text" class="select-input" id="settings-username-input" style="max-width:180px; padding:8px 12px;" maxlength="25">
-        </div>
-
-        <div class="settings-row">
-          <div class="settings-meta">
-            <h3>UI Graphic Animations</h3>
-            <p>Disable visual render transitions to conserve device battery runtime.</p>
-          </div>
-          <label class="toggle-switch">
-            <input type="checkbox" id="settings-toggle-anim" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="settings-row">
-          <div class="settings-meta">
-            <h3>Dynamic Video Live-Backdrop</h3>
-            <p>Toggle the animated loop backdrop asset execution link framework.</p>
-          </div>
-          <label class="toggle-switch">
-            <input type="checkbox" id="settings-toggle-bg" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="settings-row">
-          <div class="settings-meta">
-            <h3>Reminders Alert Shell</h3>
-            <p>Request runtime notifications via standard browser integration alerts.</p>
-          </div>
-          <button class="btn-secondary" id="settings-trigger-notify">Test Notification</button>
-        </div>
-
-        <div class="settings-row">
-          <div class="settings-meta">
-            <h3>Data Management Engine</h3>
-            <p>Export your full configuration model matrix into a clean portable backup file schema, or import a saved snapshot file.</p>
-          </div>
-          <div style="display:flex; gap:8px;">
-            <button class="btn-secondary" id="settings-export-btn">Export Profile</button>
-            <button class="btn-secondary" id="settings-import-trigger">Import File</button>
-            <input type="file" id="settings-import-file" accept=".json" style="display:none;">
-          </div>
-        </div>
-
-        <div class="settings-row" style="margin-top:20px;">
-          <div class="settings-meta">
-            <h3>Destructive Profile Reset</h3>
-            <p>Wipe all structural histories, local databases, streaks, and settings.</p>
-          </div>
-          <button class="btn-primary btn-danger" id="settings-wipe-btn">Reset Database</button>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<script>
-  const USERS_STORAGE_KEY = 'dr-slump-v2-users';
-  const CURRENT_USER_KEY = 'dr-slump-v2-current';
-
-  // SYSTEM MOTIVATIONAL DICTIONARY
-  const QUOTE_LIBRARY = [
-    { text: "It's not that I'm smart, it's just that I stay with problems longer.", author: "Albert Einstein" },
-    { text: "Do not let what you cannot do interfere with what you can do.", author: "John Wooden" },
-    { text: "We become what we repeatedly do. Excellence, then, is not an act, but a habit.", author: "Aristotle" },
-    { text: "The crossroad of failure is the precise point where experience is built.", author: "Nam Ha-neul" },
-    { text: "Small progress daily adds up to monstrous structural lifetime results.", author: "Routine Core" }
-  ];
-
-  // DOM REGISTER
-  const userSetup = document.getElementById('user-setup');
-  const app = document.getElementById('app');
-  const setupNameInput = document.getElementById('setup-name-input');
-  const setupStartBtn = document.getElementById('setup-start-btn');
-  const logoutBtn = document.getElementById('logout-btn');
-  const newTaskInput = document.getElementById('new-task-input');
-  const newTaskCat = document.getElementById('new-task-cat');
-  const addTaskBtn = document.getElementById('add-task-btn');
-  const tasksContainer = document.getElementById('tasks-container');
-  const weeklyContainer = document.getElementById('weekly-container');
-  const progressPercent = document.getElementById('progress-percent');
-  const progressCircle = document.getElementById('progress-circle');
-  const completionMessage = document.getElementById('completion-message');
-  const tabs = document.querySelectorAll('.tab-btn');
-  const tabContents = document.querySelectorAll('.tab-content');
-  const filterChips = document.querySelectorAll('.filter-chip');
-  
-  const cntDone = document.getElementById('cnt-done');
-  const cntLeft = document.getElementById('cnt-left');
-  const streakCurrLabel = document.getElementById('streak-curr');
-  const streakBestLabel = document.getElementById('streak-best');
-  
-  const settingsUsername = document.getElementById('settings-username-input');
-  const settingsToggleAnim = document.getElementById('settings-toggle-anim');
-  const settingsToggleBg = document.getElementById('settings-toggle-bg');
-  const settingsWipeBtn = document.getElementById('settings-wipe-btn');
-  const settingsExportBtn = document.getElementById('settings-export-btn');
-  const settingsImportTrigger = document.getElementById('settings-import-trigger');
-  const settingsImportFile = document.getElementById('settings-import-file');
-  const settingsTriggerNotify = document.getElementById('settings-trigger-notify');
-
-  let currentUser = null;
-  let activeFilter = 'all';
-
-  // HELPER CALENDAR DATETIME STRINGS
-  function getTodayString() {
-    const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  }
-
-  function getYesterdayString() {
-    const d = new Date();
-    d.setDate(d.getDate() - 1);
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  }
-
-  function addDays(dateStr, days) {
-    const d = new Date(dateStr + 'T00:00:00');
-    d.setDate(d.getDate() + days);
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  }
-
-  // FIXED: Returns dates ordered chronologically from oldest to newest (index 0 = oldest, index 6 = today)
-  function getWeekDates() {
-    const today = getTodayString();
-    const dates = [];
-    for (let i = 6; i >= 0; i--) {
-      dates.push(addDays(today, -i));
-    }
-    return dates;
-  }
-
-  function generateInitials(name) {
-    if (!name) return 'DS';
-    const tokens = name.trim().split(/\s+/);
-    if (tokens.length >= 2) {
-      return (tokens[0][0] + tokens[1][0]).toUpperCase();
-    }
-    return tokens[0].substring(0, 2).toUpperCase();
-  }
-
-  // DATA REFRESH STORAGE MANAGEMENT ENGINE
-  function loadCurrentUser() {
-    try {
-      const userId = localStorage.getItem(CURRENT_USER_KEY);
-      if (!userId) return null;
-      const users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '{}');
-      return users[userId] || null;
-    } catch (e) {
-      console.error("Database access failure", e);
-      return null;
-    }
-  }
-
-  function saveUser(userObj) {
-    if (!userObj) return;
-    try {
-      const users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '{}');
-      users[userObj.id] = userObj;
-      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-      localStorage.setItem(CURRENT_USER_KEY, userObj.id);
-      currentUser = userObj;
-    } catch (e) {
-      alert("Storage full! Unable to sync local configuration state changes safely.");
-    }
-  }
-
-  // RUNTIME INITIALIZATION LAYER WITH CARRIER IMPLEMENTATION
-  function init() {
-    // Media Connection Watchdog
-    const bgVideo = document.getElementById('bg-video');
-    if (bgVideo) {
-      bgVideo.addEventListener('error', () => {
-        document.querySelector('.video-bg').style.background = "radial-gradient(circle at 50% 50%, #161224 0%, #07070B 100%)";
-        bgVideo.style.display = 'none';
-      }, true);
-    }
-
-    currentUser = loadCurrentUser();
-    if (currentUser) {
-      verifyAndProcessCarryOver();
-      applyConfigProperties();
-      showApp();
-    } else {
-      showUserSetup();
-    }
-    injectQuoteCard();
-    renderAll();
-    requestNotificationPermissionSilently();
-  }
-
-  // AUTOMATIC TASK CARRIER ENGINE
-  function verifyAndProcessCarryOver() {
-    if (!currentUser) return;
-    const today = getTodayString();
-    
-    // If today's slot already has elements, skip carry-over logic
-    if (currentUser.dailyTasks[today] && currentUser.dailyTasks[today].length > 0) {
-      evaluateStreakMetrics();
-      return;
-    }
-
-    // Initialize clean record array
-    if (!currentUser.dailyTasks[today]) {
-      currentUser.dailyTasks[today] = [];
-    }
-
-    // Locate the most recent available date log containing historical objectives
-    const dateKeys = Object.keys(currentUser.dailyTasks).sort();
-    let sourceDate = null;
-    
-    for (let i = dateKeys.length - 1; i >= 0; i--) {
-      if (dateKeys[i] < today && currentUser.dailyTasks[dateKeys[i]].length > 0) {
-        sourceDate = dateKeys[i];
-        break;
-      }
-    }
-
-    if (sourceDate) {
-      // Safely duplicate historical items with state resets
-      currentUser.dailyTasks[today] = currentUser.dailyTasks[sourceDate].map(task => ({
-        id: 'task_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now(),
-        title: task.title,
-        category: task.category || 'Personal 🌱',
-        completed: false
-      }));
-    }
-
-    evaluateStreakMetrics();
-    saveUser(currentUser);
-  }
-
-  // STATE-MACHINE SYSTEM CALCULATION ENGINE
-  function evaluateStreakMetrics() {
-    if (!currentUser) return;
-    if (!currentUser.streaks) {
-      currentUser.streaks = { current: 0, best: 0, lastCheckedDate: "" };
-    }
-
-    const today = getTodayString();
-    const yesterday = getYesterdayString();
-    const lastCheck = currentUser.streaks.lastCheckedDate;
-
-    if (lastCheck === today) return; // Prevent duplicate daily updates
-
-    // Evaluate task parameters on previous data records
-    function evalDayPassed(dateStr) {
-      const items = currentUser.dailyTasks[dateStr];
-      if (!items || items.length === 0) return false;
-      return items.every(t => t.completed);
-    }
-
-    const completedYesterday = evalDayPassed(yesterday);
-    const completedToday = evalDayPassed(today);
-
-    if (completedToday) {
-      if (lastCheck === yesterday) {
-        currentUser.streaks.current += 1;
-      } else if (currentUser.streaks.current === 0) {
-        currentUser.streaks.current = 1;
-      }
-      currentUser.streaks.lastCheckedDate = today;
-    } else {
-      // Break streak sequence if yesterday metrics are left unfulfilled
-      if (lastCheck !== yesterday && lastCheck !== today) {
-        currentUser.streaks.current = 0;
-      }
-    }
-
-    if (currentUser.streaks.current > currentUser.streaks.best) {
-      currentUser.streaks.best = currentUser.streaks.current;
-    }
-  }
-
-  function injectQuoteCard() {
-    const hash = new Date().getDate() % QUOTE_LIBRARY.length;
-    const selected = QUOTE_LIBRARY[hash];
-    document.getElementById('quote-display').textContent = `"${selected.text}"`;
-    document.getElementById('quote-author').textContent = `— ${selected.author}`;
-  }
-
-  function createUser(nameStr) {
-    const today = getTodayString();
-    const cleanName = nameStr.trim() || 'User';
-    const id = 'usr_' + Date.now();
-    
-    const initialProfile = {
-      id,
-      name: cleanName,
-      dailyTasks: {
-        [today]: [
-          { id: 't1', title: 'Morning hydration workout 🏃‍♂️', category: 'Health 💪', completed: false },
-          { id: 't2', title: 'Review focus curriculum notes 📚', category: 'Study 📚', completed: false },
-          { id: 't3', title: 'Check target roadmap layout 🌱', category: 'Personal 🌱', completed: false }
-        ]
-      },
-      streaks: { current: 0, best: 0, lastCheckedDate: "" },
-      config: { animations: true, backdropVideo: true },
-      createdAt: new Date().toISOString()
-    };
-
-    saveUser(initialProfile);
-    applyConfigProperties();
-    return initialProfile;
-  }
-
-  function applyConfigProperties() {
-    if (!currentUser) return;
-    if (!currentUser.config) {
-      currentUser.config = { animations: true, backdropVideo: true };
-    }
-
-    // Animation Layout Management Toggle
-    if (currentUser.config.animations) {
-      document.body.classList.remove('no-animations');
-      settingsToggleAnim.checked = true;
-    } else {
-      document.body.classList.add('no-animations');
-      settingsToggleAnim.checked = false;
-    }
-
-    // Live Video Playback Toggle
-    const bgVid = document.getElementById('bg-video');
-    if (currentUser.config.backdropVideo) {
-      if (bgVid) bgVid.style.display = 'block';
-      settingsToggleBg.checked = true;
-    } else {
-      if (bgVid) bgVid.style.display = 'none';
-      settingsToggleBg.checked = false;
-    }
-
-    settingsUsername.value = currentUser.name;
-  }
-
-  function getTodayTasks() {
-    if (!currentUser) return [];
-    const today = getTodayString();
-    if (!currentUser.dailyTasks[today]) currentUser.dailyTasks[today] = [];
-    return currentUser.dailyTasks[today];
-  }
-
-  // OPERATIONS CONTROLLERS (MUTATION LAYERS)
-  function createTaskItem() {
-    const rawVal = newTaskInput.value.trim();
-    if (!rawVal) return;
-    
-    const activeTasks = getTodayTasks();
-    activeTasks.push({
-      id: 'task_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now(),
-      title: rawVal,
-      category: newTaskCat.value,
-      completed: false
-    });
-
-    newTaskInput.value = '';
-    evaluateStreakMetrics();
-    saveUser(currentUser);
-    renderAll();
-  }
-
-  function removeTaskItem(taskId) {
-    if (!currentUser) return;
-    const today = getTodayString();
-    currentUser.dailyTasks[today] = getTodayTasks().filter(t => t.id !== taskId);
-    evaluateStreakMetrics();
-    saveUser(currentUser);
-    renderAll();
-  }
-
-  function toggleTaskState(taskId) {
-    if (!currentUser) return;
-    const activeList = getTodayTasks();
-    const targeted = activeList.find(t => t.id === taskId);
-    if (targeted) {
-      targeted.completed = !targeted.completed;
-      evaluateStreakMetrics();
-      saveUser(currentUser);
-      renderAll();
-      triggerCompletionEffectsCheck();
-    }
-  }
-
-  function editTaskTitleInline(taskId, newTextStr) {
-    if (!currentUser) return;
-    const cleanStr = newTextStr.trim();
-    const activeList = getTodayTasks();
-    const target = activeList.find(t => t.id === taskId);
-    
-    if (target && cleanStr && target.title !== cleanStr) {
-      target.title = cleanStr;
-      saveUser(currentUser);
-      updateDashboardPills();
-    }
-  }
-
-  function triggerCompletionEffectsCheck() {
-    const list = getTodayTasks();
-    if (list.length > 0 && list.every(t => t.completed)) {
-      sendSystemAlertNotification("Sector Consolidated!", "All task matrix objectives for today are officially cleared.");
-    }
-  }
-
-  // VIEW RENDERING INTERFACE LOGIC
-  function showUserSetup() { userSetup.classList.add('active'); app.classList.remove('active'); }
-  function showApp() { userSetup.classList.remove('active'); app.classList.add('active'); }
-
-  function updateDashboardPills() {
-    if (!currentUser) return;
-    
-    const initials = generateInitials(currentUser.name);
-    document.getElementById('user-avatar').textContent = initials;
-    document.getElementById('user-name').textContent = currentUser.name;
-
-    const tasks = getTodayTasks();
-    const completedCount = tasks.filter(t => t.completed).length;
-    const remainingCount = tasks.length - completedCount;
-    
-    let ratePercent = 0;
-    if (tasks.length > 0) {
-      ratePercent = Math.round((completedCount / tasks.length) * 100);
-    }
-
-    progressPercent.textContent = ratePercent + '%';
-    cntDone.textContent = completedCount;
-    cntLeft.textContent = remainingCount;
-
-    const circumference = 2 * Math.PI * 41;
-    const offsetDash = circumference - (ratePercent / 100) * circumference;
-    progressCircle.style.strokeDasharray = circumference;
-    progressCircle.style.strokeDashoffset = offsetDash;
-
-    if (ratePercent === 100 && tasks.length > 0) {
-      completionMessage.classList.add('show');
-    } else {
-      completionMessage.classList.remove('show');
-    }
-
-    if (currentUser.streaks) {
-      streakCurrLabel.textContent = `${currentUser.streaks.current} Day${currentUser.streaks.current === 1 ? '' : 's'}`;
-      streakBestLabel.textContent = `${currentUser.streaks.best} Day${currentUser.streaks.best === 1 ? '' : 's'}`;
-    }
-  }
-
-  function renderTasksGrid() {
-    const container = document.getElementById('tasks-container');
-    const tasks = getTodayTasks();
-    
-    const processedTasks = tasks.filter(t => {
-      if (activeFilter === 'all') return true;
-      return t.category === activeFilter;
-    });
-
-    if (processedTasks.length === 0) {
-      if (tasks.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-title">Workspace Streamlined & Clear</div>
-            <p class="empty-desc">No tasks logged under today's calendar path. Quick-select an internal preset strategy pattern below to begin:</p>
-            <div class="template-box">
-              <button class="btn-secondary" onclick="injectTemplateTask('Read documentation module 📖','Study 📚')">+ Study Mode</button>
-              <button class="btn-secondary" onclick="injectTemplateTask('Physical functional workout 🏃‍♂️','Health 💪')">+ Health Target</button>
-              <button class="btn-secondary" onclick="injectTemplateTask('Reflect on daily growth 🤲','Deen 🤲')">+ Growth Reflection</button>
+            <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent-gold);">
+                <i class="fas fa-fire"></i> <span id="streak-counter">0</span> Days
             </div>
-          </div>`;
-      } else {
-        container.innerHTML = `<div class="empty-state"><p class="empty-desc">No active objectives match the current category filter view model.</p></div>`;
-      }
-      return;
-    }
+        </header>
 
-    container.innerHTML = processedTasks.map(task => `
-      <div class="task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
-        <button class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTaskState('${task.id}')" aria-label="Toggle execution completion validation mark">
-          ${task.completed ? '✓' : ''}
-        </button>
-        <div class="task-content-wrapper">
-          <span class="task-label" contenteditable="true" onblur="editTaskTitleInline('${task.id}', this.innerText)" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.blur();}">$${task.title}</span>
-          <span class="task-cat-badge">${task.category || 'Personal 🌱'}</span>
+        <!-- STATISTIKA PANELI -->
+        <div class="analytics-card">
+            <div class="progress-circle-container">
+                <!-- SVG progress doirasi -->
+                <svg width="120" height="120" style="transform: rotate(-90deg);">
+                    <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.05)" stroke-width="8" fill="transparent"/>
+                    <circle id="progress-bar" cx="60" cy="60" r="50" stroke="var(--accent-purple)" stroke-width="8" fill="transparent"
+                            stroke-dasharray="314" stroke-dashoffset="314" style="transition: stroke-dashoffset 0.4s ease;"/>
+                </svg>
+                <div class="progress-value" id="progress-percentage">0%</div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Completed</div>
+                    <div class="stat-number" id="stats-completed">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Remaining</div>
+                    <div class="stat-number" id="stats-remaining">0</div>
+                </div>
+            </div>
         </div>
-        <div class="task-actions">
-          <button class="action-icon-btn delete-btn" onclick="removeTaskItem('${task.id}')" aria-label="Erase task sequence structure">✕</button>
+
+        <!-- YANGI VAZIFA QO'SHISH -->
+        <div class="creator-section">
+            <div class="task-input-row">
+                <input type="text" id="task-input" placeholder="Type a task objective...">
+                <select id="category-input" class="select-category">
+                    <option value="study">Study 📚</option>
+                    <option value="health">Health 💪</option>
+                    <option value="deen">Deen 🕌</option>
+                    <option value="personal">Personal ⚡</option>
+                </select>
+                <button class="btn-add" onclick="addTask()">Add Task</button>
+            </div>
         </div>
-      </div>
-    `).join('');
-  }
 
-  function injectTemplateTask(titleText, categoryText) {
-    newTaskInput.value = titleText;
-    newTaskCat.value = categoryText;
-    createTaskItem();
-  }
-  window.injectTemplateTask = injectTemplateTask;
-
-  function renderAnalyticsInterface() {
-    if (!currentUser) return;
-    const weekDates = getWeekDates();
-    const dayNamesList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-    let compiledTotalDone = 0;
-    let compiledTotalMissed = 0;
-    let maximumRateVal = -1;
-    let absolutePeakDayStr = "N/A";
-    let calculationDaysValid = 0;
-    let totalRatiosSum = 0;
-
-    const diagnosticLogsMarkup = weekDates.map(dateKey => {
-      const dayTasks = currentUser.dailyTasks[dateKey] || [];
-      const doneCount = dayTasks.filter(t => t.completed).length;
-      const missedCount = dayTasks.length - doneCount;
-      
-      compiledTotalDone += doneCount;
-      compiledTotalMissed += missedCount;
-
-      const individualRatio = dayTasks.length === 0 ? 0 : Math.round((doneCount / dayTasks.length) * 100);
-      
-      if (dayTasks.length > 0) {
-        calculationDaysValid++;
-        totalRatiosSum += individualRatio;
-      }
-
-      const calendarNode = new Date(dateKey + 'T00:00:00');
-      const textDayLabel = dayNamesList[calendarNode.getDay()];
-      const localizedFormDate = calendarNode.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-      if (dayTasks.length > 0 && individualRatio >= maximumRateVal) {
-        maximumRateVal = individualRatio;
-        absolutePeakDayStr = `${textDayLabel} (${individualRatio}%)`;
-      }
-
-      return {
-        dateKey,
-        textDayLabel,
-        localizedFormDate,
-        total: dayTasks.length,
-        doneCount,
-        missedCount,
-        individualRatio
-      };
-    });
-
-    const runtimeAverageRate = calculationDaysValid === 0 ? 0 : Math.round(totalRatiosSum / calculationDaysValid);
-
-    // Populate dashboard metric selectors
-    document.getElementById('stat-w-done').textContent = compiledTotalDone;
-    document.getElementById('stat-w-pct').textContent = runtimeAverageRate + '%';
-    document.getElementById('stat-w-best').textContent = absolutePeakDayStr;
-    document.getElementById('stat-w-miss').textContent = compiledTotalMissed;
-
-    // Render 7-Day Completion Trend Chart Bars
-    const chartContainer = document.getElementById('trend-bar-chart');
-    chartContainer.innerHTML = diagnosticLogsMarkup.map(log => `
-      <div class="chart-column">
-        <div class="chart-bar-container" title="Completion Rate: ${log.individualRatio}% (${log.doneCount}/${log.total} tasks)">
-          <div class="chart-bar-fill" style="height: ${log.total === 0 ? 0 : log.individualRatio}%;"></div>
+        <!-- SARALASH TUGMALARI -->
+        <div class="filter-row">
+            <button class="filter-btn active" onclick="filterTasks('all', this)">All Items</button>
+            <button class="filter-btn" onclick="filterTasks('study', this)">Study 📚</button>
+            <button class="filter-btn" onclick="filterTasks('health', this)">Health 💪</button>
+            <button class="filter-btn" onclick="filterTasks('deen', this)">Deen 🕌</button>
+            <button class="filter-btn" onclick="filterTasks('personal', this)">Personal ⚡</button>
         </div>
-        <div class="chart-day-label">${log.textDayLabel}</div>
-      </div>
-    `).join('');
 
-    // Generate historical list view markup output
-    weeklyContainer.innerHTML = diagnosticLogsMarkup.map(log => `
-      <div class="week-day">
-        <div class="week-day-header">
-          <div class="week-day-title">${log.textDayLabel} <span style="font-weight:400; font-size:12px; color:var(--text-dim);">— ${log.localizedFormDate}</span></div>
-          <div class="week-day-date">${log.individualRatio}%</div>
+        <!-- VAZIFALAR RO'YXATI -->
+        <div class="tasks-grid">
+            <div class="grid-title"><i class="fas fa-layer-group"></i> Daily Execution Grid</div>
+            <div id="tasks-container">
+                <!-- Dinamik elementlar shu yerga tushadi -->
+            </div>
         </div>
-        <div class="week-day-stats">
-          <div class="stat-box">
-            <div class="stat-value" style="font-size:16px;">${log.total}</div>
-            <div class="stat-label">Total</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-value" style="color:var(--green); font-size:16px;">${log.doneCount}</div>
-            <div class="stat-label">Done</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-value" style="color:var(--pink); font-size:16px;">${log.missedCount}</div>
-            <div class="stat-label">Missed</div>
-          </div>
-        </div>
-      </div>
-    `).reverse().join(''); // Present reverse list view targeting immediate proximity layout dates first
-  }
+    </div>
 
-  function renderAll() {
-    updateDashboardPills();
-    renderTasksGrid();
-    renderAnalyticsInterface();
-  }
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('hottie_tasks')) || [];
+        let currentFilter = 'all';
+        let currentUsername = localStorage.getItem('hottie_username') || '';
 
-  // SYSTEM CONTROL ROUTERS (TAB CONTROLLERS)
-  function routeTabDisplay(targetName) {
-    tabs.forEach(t => {
-      t.classList.toggle('active', t.getAttribute('data-tab') === targetName);
-    });
+        window.onload = function() {
+            if (currentUsername) {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('main-dashboard').style.display = 'block';
+                setupDashboard();
+            }
+            
+            // Notification so'rash
+            if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                Notification.requestPermission();
+            }
+        };
 
-    // FIXED: Strict structural targeting prevents mapping clashes against custom components sharing exact data values
-    tabContents.forEach(panel => {
-      panel.classList.toggle('active', panel.getAttribute('data-tab') === targetName);
-    });
-
-    if (targetName === 'weekly') {
-      renderAnalyticsInterface();
-    }
-  }
-
-  // INTERFACE INTERACTION LISTENERS BLOCK
-  tabs.forEach(btn => {
-    btn.addEventListener('click', () => routeTabDisplay(btn.getAttribute('data-tab')));
-  });
-
-  document.getElementById('nav-dash-btn').addEventListener('click', () => routeTabDisplay('daily'));
-  document.getElementById('nav-config-btn').addEventListener('click', () => routeTabDisplay('settings'));
-
-  filterChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      filterChips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      activeFilter = chip.getAttribute('data-filter');
-      renderTasksGrid();
-    });
-  });
-
-  setupStartBtn.addEventListener('click', () => {
-    const value = setupNameInput.value.trim();
-    if (value) {
-      createUser(value);
-      showApp();
-      renderAll();
-    }
-  });
-
-  setupNameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') setupStartBtn.click(); });
-  addTaskBtn.addEventListener('click', createTaskItem);
-  newTaskInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') createTaskItem(); });
-
-  logoutBtn.addEventListener('click', () => {
-    if (confirm("De-authorize and exit current deployment instance profile? Settings will remain tracked on local cache blocks.")) {
-      localStorage.removeItem(CURRENT_USER_KEY);
-      currentUser = null;
-      showUserSetup();
-      setupNameInput.value = '';
-    }
-  });
-
-  // SYSTEM SETTINGS SUBPANEL EXECUTION LOGIC
-  settingsUsername.addEventListener('input', () => {
-    if (!currentUser) return;
-    const update = settingsUsername.value.trim();
-    if (update) {
-      currentUser.name = update;
-      saveUser(currentUser);
-      updateDashboardPills();
-    }
-  });
-
-  settingsToggleAnim.addEventListener('change', () => {
-    if (!currentUser) return;
-    currentUser.config.animations = settingsToggleAnim.checked;
-    saveUser(currentUser);
-    applyConfigProperties();
-  });
-
-  settingsToggleBg.addEventListener('change', () => {
-    if (!currentUser) return;
-    currentUser.config.backdropVideo = settingsToggleBg.checked;
-    saveUser(currentUser);
-    applyConfigProperties();
-  });
-
-  settingsWipeBtn.addEventListener('click', () => {
-    if (confirm("CRITICAL WARNING: This action permanently deletes the local configuration profile, all database items, historical execution trends, and active streak metrics. Proceed with deletion?")) {
-      localStorage.removeItem(CURRENT_USER_KEY);
-      localStorage.removeItem(USERS_STORAGE_KEY);
-      window.location.reload();
-    }
-  });
-
-  // HARDWARE DATA PERSISTENCE INTEGRATION ENGINE (JSON PORT FILE BACKUPS)
-  settingsExportBtn.addEventListener('click', () => {
-    if (!currentUser) return;
-    try {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentUser, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `dr-slump-backup-${currentUser.name.toLowerCase().replace(/\s+/g, '-')}-${getTodayString()}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    } catch (e) {
-      alert("Export file formulation runtime dropped.");
-    }
-  });
-
-  settingsImportTrigger.addEventListener('click', () => settingsImportFile.click());
-  settingsImportFile.addEventListener('change', (e) => {
-    const fileReader = new FileReader();
-    if (!e.target.files[0]) return;
-    
-    fileReader.onload = function(event) {
-      try {
-        const parsedModel = JSON.parse(event.target.result);
-        if (parsedModel && parsedModel.id && parsedModel.dailyTasks) {
-          // Commit full import merge overrides directly against structural storage fields
-          const masterStore = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '{}');
-          masterStore[parsedModel.id] = parsedModel;
-          localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(masterStore));
-          localStorage.setItem(CURRENT_USER_KEY, parsedModel.id);
-          
-          alert("Import successful! Refreshing system workspace layers...");
-          window.location.reload();
-        } else {
-          alert("Invalid file type: Selected file lacks required schema properties.");
+        function initializeWorkspace() {
+            const input = document.getElementById('username-input').value.trim();
+            if (!input) return alert('Iltimos, ismingizni kiriting!');
+            
+            localStorage.setItem('hottie_username', input);
+            currentUsername = input;
+            
+            document.getElementById('auth-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('main-dashboard').style.display = 'block';
+                setupDashboard();
+            }, 500);
         }
-      } catch (err) {
-        alert("Parse failure: Selected asset matrix is structurally broken.");
-      }
-    };
-    fileReader.readAsText(e.target.files[0]);
-  });
 
-  // BROWSER NOTIFICATION SHELL API LAYER
-  function requestNotificationPermissionSilently() {
-    if ("Notification" in window && Notification.permission === "default") {
-      Notification.requestPermission();
-    }
-  }
-
-  function sendSystemAlertNotification(titleText, bodyText) {
-    if ("Notification" in window && Notification.permission === "granted") {
-      new Notification(titleText, {
-        body: bodyText,
-        icon: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🩺</text></svg>"
-      });
-    } else {
-      // In-app fallback layout trigger mechanism if permissions are blocked or disabled
-      console.log(`Alert Notification Drop Event: ${titleText} - ${bodyText}`);
-    }
-  }
-
-  settingsTriggerNotify.addEventListener('click', () => {
-    if ("Notification" in window) {
-      Notification.requestPermission().then(status => {
-        if (status === "granted") {
-          sendSystemAlertNotification("System Channel Diagnostics", "Live event pipeline alerts are fully functional.");
-        } else {
-          alert("Permission to receive system notifications was denied on this browser environment.");
+        function setupDashboard() {
+            document.getElementById('welcome-text').innerText = `${currentUsername}'s Workspace`;
+            document.getElementById('user-avatar').innerText = currentUsername.charAt(0).toUpperCase();
+            updateStreak();
+            renderTasks();
         }
-      });
-    } else {
-      alert("Native hardware notifications are unsupported on this system platform browser.");
-    }
-  });
 
-  window.toggleTaskState = toggleTaskState;
-  window.removeTaskItem = removeTaskItem;
-  window.editTaskTitleInline = editTaskTitleInline;
+        function updateStreak() {
+            let streak = localStorage.getItem('hottie_streak') || 0;
+            let lastDate = localStorage.getItem('hottie_last_date');
+            const today = new Date().toDateString();
 
-  // Initialize workspace routine core application runtime sequence loop
-  init();
-</script>
+            if (lastDate === today) {
+                // Bugun allaqachon kirilgan
+            } else {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                if (lastDate === yesterday.toDateString()) {
+                    streak = parseInt(streak) + 1;
+                } else if (!lastDate) {
+                    streak = 1;
+                } else {
+                    streak = 1; // Streak uzilgan bo'lsa qaytadan boshlash
+                }
+                localStorage.setItem('hottie_streak', streak);
+                localStorage.setItem('hottie_last_date', today);
+            }
+            document.getElementById('streak-counter').innerText = streak;
+        }
+
+        function addTask() {
+            const textInput = document.getElementById('task-input');
+            const categoryInput = document.getElementById('category-input');
+            
+            if (!textInput.value.trim()) return;
+
+            const newTask = {
+                id: Date.now(),
+                text: textInput.value.trim(),
+                category: categoryInput.value,
+                completed: false,
+                date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            tasks.push(newTask);
+            textInput.value = '';
+            saveAndRefresh();
+        }
+
+        function toggleTask(id) {
+            tasks = tasks.map(t => t.id === id ? {...t, completed: !t.completed} : t);
+            
+            // Agar vazifa bajarilsa bildirishnoma yuborish
+            const task = tasks.find(t => t.id === id);
+            if (task && task.completed && Notification.permission === "granted") {
+                new Notification("Muvaffaqiyat! 🎉", {
+                    body: `"${task.text}" vazifasini a'lo darajada yakunladingiz. To'xtamang!`,
+                    icon: "https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg"
+                });
+            }
+            
+            saveAndRefresh();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveAndRefresh();
+        }
+
+        function filterTasks(category, element) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            renderTasks();
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('hottie_tasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('tasks-container');
+            container.innerHTML = '';
+
+            const filtered = tasks.filter(t => currentFilter === 'all' || t.category === currentFilter);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state">Hozircha hech qanday maqsad yoki vazifa yo'q. Yangi maqsad qo'shing!</div>`;
+                updateAnalytics(0, 0);
+                return;
+            }
+
+            filtered.forEach(task => {
+                const item = document.createElement('div');
+                item.className = `task-item ${task.completed ? 'completed' : ''}`;
+                item.innerHTML = `
+                    <div class="task-left">
+                        <div class="checkbox-custom" onclick="toggleTask(${task.id})"></div>
+                        <div>
+                            <div>${task.text}</div>
+                            <div class="task-meta">
+                                <span class="tag tag-${task.category}">${task.category}</span>
+                                <span><i class="far fa-clock"></i> ${task.date}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-delete" onclick="deleteTask(${task.id})"><i class="fas fa-trash-alt"></i></button>
+                `;
+                container.appendChild(item);
+            });
+
+            // Analitika hisoblash
+            const completedCount = tasks.filter(t => t.completed).length;
+            const totalCount = tasks.length;
+            updateAnalytics(completedCount, totalCount);
+        }
+
+        function updateAnalytics(completed, total) {
+            const remaining = total - completed;
+            const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+            document.getElementById('stats-completed').innerText = completed;
+            document.getElementById('stats-remaining').innerText = remaining;
+            document.getElementById('progress-percentage').innerText = `${percentage}%`;
+
+            // SVG doira progressni yangilash
+            const circle = document.getElementById('progress-bar');
+            const circumference = 2 * Math.PI * 50; // r=50 -> 314
+            const offset = circumference - (percentage / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+        }
+    </script>
 </body>
 </html>
